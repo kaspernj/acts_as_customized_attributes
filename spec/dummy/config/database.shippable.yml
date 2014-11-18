@@ -1,6 +1,6 @@
 test:
   adapter: mysql2
   encoding: utf8
-  database: techsup_test
+  database: acts_as_customized_attributes
   pool: 5
   username: shippa
