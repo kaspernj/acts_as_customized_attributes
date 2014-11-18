@@ -11,7 +11,54 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20141118114902) do
+ActiveRecord::Schema.define(:version => 20141118135027) do
+
+  create_table "order_data", :force => true do |t|
+    t.integer  "resource_id"
+    t.string   "resource_type"
+    t.integer  "data_key_id"
+    t.string   "value"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "order_data", ["data_key_id"], :name => "index_order_data_on_data_key_id"
+
+  create_table "order_data_keys", :force => true do |t|
+    t.string   "name"
+    t.string   "title"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "order_data_keys", ["name"], :name => "index_order_data_keys_on_name"
+
+  create_table "orders", :force => true do |t|
+    t.integer  "user_id"
+    t.float    "amount_full"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "user_data", :force => true do |t|
+    t.integer  "resource_id"
+    t.string   "resource_type"
+    t.integer  "data_key_id"
+    t.string   "value"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "user_data", ["data_key_id"], :name => "index_user_data_on_data_key_id"
+
+  create_table "user_data_keys", :force => true do |t|
+    t.string   "name"
+    t.string   "title"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "user_data_keys", ["name"], :name => "index_user_data_keys_on_name"
 
   create_table "users", :force => true do |t|
     t.string   "email"
