@@ -4,9 +4,12 @@
 
 # ActsAsCustomizedAttributes
 
-This project rocks and uses MIT-LICENSE.
+Add custom attributes to your models, which doesn't have predefined names but can be created runtime, and still be able to do queries on that data.
+
 
 ## Install
+
+### Bundle
 
 Add this to your Gemfile and bundle:
 ```ruby
@@ -22,6 +25,8 @@ end
 ```
 
 ### Create a migration
+
+This creates the tables "some_model_data_keys" and "some_model_data", where the custom attributes will be stored.
 
 ```ruby
 class AddCustomizedAttributesForSomeModel < ActiveRecord::Migration
@@ -62,3 +67,7 @@ SomeModel::DataKey.where("name LIKE '%facebook%'")
 ```ruby
 SomeModel::Data.where("resource_id > 5")
 ```
+
+## License
+
+This project uses MIT-LICENSE.
