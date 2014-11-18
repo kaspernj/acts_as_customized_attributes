@@ -31,7 +31,7 @@ This creates the tables "some_model_data_keys" and "some_model_data", where the 
 ```ruby
 class AddCustomizedAttributesForSomeModel < ActiveRecord::Migration
   def up
-    SomeModel.create_cuostmized_attributes!
+    SomeModel.create_customized_attributes!
   end
   
   def down
