@@ -3,7 +3,7 @@ module ActsAsCustomizedAttributes::InstanceMethods
     data.each do |key, value|
       key = self.class.aaca_key_class.find_or_create_by_name(key)
 
-      data = self.class.aaca_data_class.find_or_initialize_by_data_key_id_and_resource_type_and_resource_id(key.id, self.class.name, id)
+      data = self.class.aaca_data_class.find_or_initialize_by_data_key_id_and_resource_id(key.id, id)
       data.value = value
       data.save!
     end

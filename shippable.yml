@@ -2,9 +2,10 @@ language: ruby
 cache: bundler
 archive: true
 rvm:
-  - 1.9.3
+  - 1.9.3-p547
 before_script:
   - cp spec/dummy/config/database.shippable.yml spec/dummy/config/database.yml
+  - mysql -e 'DROP DATABASE IF EXISTS acts_as_customized_attributes;'
   - mysql -e 'CREATE DATABASE acts_as_customized_attributes;'
   - cd spec/dummy
   - RAILS_ENV=test bundle exec rake db:migrate

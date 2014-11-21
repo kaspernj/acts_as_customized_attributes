@@ -6,13 +6,14 @@ module ActsAsCustomizedAttributes::ClassMethods
     class_data_key = Class.new(ActsAsCustomizedAttributes::DataKey) do
       set_table_name $aaca_class_name_key.tableize
 
-      has_many :data, class_name: $aaca_class_name_data
+      has_many :data, class_name: $aaca_class_name_data, dependent: :destroy
     end
 
     class_data = Class.new(ActsAsCustomizedAttributes::Data) do
       set_table_name $aaca_class_name_data.tableize
 
       belongs_to :data_key, class_name: $aaca_class_name_key
+
       validates_associated :data_key
     end
 
@@ -21,7 +22,7 @@ module ActsAsCustomizedAttributes::ClassMethods
 
     include ActsAsCustomizedAttributes::InstanceMethods
 
-    has_many :data, class_name: "#{name}Data", as: "resource"
+    has_many :data, class_name: "#{name}Data", foreign_key: "resource_id", dependent: :destroy
   end
 
   def create_customized_attributes!
@@ -57,7 +58,7 @@ private
         add_index $acts_as_customized_attributes_keys_table_name, :name
 
         create_table $acts_as_customized_attributes_table_name do |t|
-          t.belongs_to :resource, polymorphic: true
+          t.belongs_to :resource
           t.belongs_to :data_key
           t.string :value
           t.timestamps

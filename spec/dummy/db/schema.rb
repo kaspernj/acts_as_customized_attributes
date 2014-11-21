@@ -15,7 +15,6 @@ ActiveRecord::Schema.define(:version => 20141118135027) do
 
   create_table "order_data", :force => true do |t|
     t.integer  "resource_id"
-    t.string   "resource_type"
     t.integer  "data_key_id"
     t.string   "value"
     t.datetime "created_at"
@@ -42,7 +41,6 @@ ActiveRecord::Schema.define(:version => 20141118135027) do
 
   create_table "user_data", :force => true do |t|
     t.integer  "resource_id"
-    t.string   "resource_type"
     t.integer  "data_key_id"
     t.string   "value"
     t.datetime "created_at"
