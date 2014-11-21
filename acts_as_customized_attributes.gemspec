@@ -14,7 +14,7 @@ Gem::Specification.new do |s|
   s.description = "Key-based custom attributes that can be created on the fly for ActiveRecord models."
 
   s.files = Dir["{app,config,db,lib}/**/*"] + ["MIT-LICENSE", "Rakefile", "README.md"]
-  s.test_files = Dir["test/**/*"]
+  s.test_files = Dir["spec/**/*"]
 
   s.add_dependency "rails", "~> 3.1.12"
   s.add_development_dependency "rspec-rails"
