@@ -5,15 +5,15 @@ describe User do
   let!(:order){ create :order, user: user }
 
   before do
-    user.update_customized_data(facebook_email: "kaspernj@facebook.com")
+    user.update_customized_attributes(facebook_email: "kaspernj@facebook.com")
   end
 
   it "should be possible to set custom data and it shouldn't mix up" do
-    user.update_customized_data(facebook_email: "kaspernj@facebook.com")
+    user.update_customized_attributes(facebook_email: "kaspernj@facebook.com")
 
-    order.update_customized_data(affiliate_data: "test")
-    order.customized_data[:affiliate_data].should eq "test"
-    order.customized_data[:facebook_email].should eq nil
+    order.update_customized_attributes(affiliate_data: "test")
+    order.customized_attributes[:affiliate_data].should eq "test"
+    order.customized_attributes[:facebook_email].should eq nil
   end
 
   it "should autodelete when destroyed" do
