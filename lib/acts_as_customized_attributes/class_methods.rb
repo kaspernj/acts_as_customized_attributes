@@ -65,6 +65,7 @@ private
         end
 
         add_index $acts_as_customized_attributes_table_name, :data_key_id
+        add_index $acts_as_customized_attributes_table_name, :resource_id
       end
 
       def down

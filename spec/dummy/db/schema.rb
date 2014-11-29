@@ -22,6 +22,7 @@ ActiveRecord::Schema.define(:version => 20141118135027) do
   end
 
   add_index "order_data", ["data_key_id"], :name => "index_order_data_on_data_key_id"
+  add_index "order_data", ["resource_id"], :name => "index_order_data_on_resource_id"
 
   create_table "order_data_keys", :force => true do |t|
     t.string   "name"
@@ -48,6 +49,7 @@ ActiveRecord::Schema.define(:version => 20141118135027) do
   end
 
   add_index "user_data", ["data_key_id"], :name => "index_user_data_on_data_key_id"
+  add_index "user_data", ["resource_id"], :name => "index_user_data_on_resource_id"
 
   create_table "user_data_keys", :force => true do |t|
     t.string   "name"
