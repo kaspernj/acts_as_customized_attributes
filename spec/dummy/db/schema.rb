@@ -21,6 +21,7 @@ ActiveRecord::Schema.define(:version => 20141118135027) do
     t.datetime "updated_at"
   end
 
+  add_index "order_data", ["data_key_id", "resource_id"], :name => "index_order_data_on_data_key_id_and_resource_id", :unique => true
   add_index "order_data", ["data_key_id"], :name => "index_order_data_on_data_key_id"
   add_index "order_data", ["resource_id"], :name => "index_order_data_on_resource_id"
 
@@ -31,7 +32,7 @@ ActiveRecord::Schema.define(:version => 20141118135027) do
     t.datetime "updated_at"
   end
 
-  add_index "order_data_keys", ["name"], :name => "index_order_data_keys_on_name"
+  add_index "order_data_keys", ["name"], :name => "index_order_data_keys_on_name", :unique => true
 
   create_table "orders", :force => true do |t|
     t.integer  "user_id"
@@ -48,6 +49,7 @@ ActiveRecord::Schema.define(:version => 20141118135027) do
     t.datetime "updated_at"
   end
 
+  add_index "user_data", ["data_key_id", "resource_id"], :name => "index_user_data_on_data_key_id_and_resource_id", :unique => true
   add_index "user_data", ["data_key_id"], :name => "index_user_data_on_data_key_id"
   add_index "user_data", ["resource_id"], :name => "index_user_data_on_resource_id"
 
@@ -58,7 +60,7 @@ ActiveRecord::Schema.define(:version => 20141118135027) do
     t.datetime "updated_at"
   end
 
-  add_index "user_data_keys", ["name"], :name => "index_user_data_keys_on_name"
+  add_index "user_data_keys", ["name"], :name => "index_user_data_keys_on_name", :unique => true
 
   create_table "users", :force => true do |t|
     t.string   "email"

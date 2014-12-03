@@ -6,7 +6,12 @@ module ActsAsCustomizedAttributes::ClassMethods
     class_data_key = Class.new(ActsAsCustomizedAttributes::DataKey) do
       set_table_name $aaca_class_name_key.tableize
 
-      has_many :data, class_name: $aaca_class_name_data, dependent: :destroy
+      has_many :data, class_name: $aaca_class_name_data, foreign_key: "data_key_id", dependent: :destroy
+
+      after_create :add_to_cache
+      after_update :add_to_cache
+      after_destroy :remove_from_cache
+      before_update :remove_from_cache
     end
 
     class_data = Class.new(ActsAsCustomizedAttributes::Data) do
@@ -23,6 +28,17 @@ module ActsAsCustomizedAttributes::ClassMethods
     include ActsAsCustomizedAttributes::InstanceMethods
 
     has_many :data, class_name: "#{name}Data", foreign_key: "resource_id", dependent: :destroy
+
+    scope :join_customized_attribute, lambda { |key|
+      key_id = aaca_key_class.id_for_name(key)
+      join_name = "customized_attribute_#{key}"
+      joins("LEFT JOIN `#{aaca_data_class.table_name}` AS `#{join_name}` ON resource_id = `#{table_name}`.`id` AND `#{join_name}`.`data_key_id` = '#{key_id}'")
+    }
+
+    scope :where_customized_attribute, lambda { |key, value|
+      join_name = "customized_attribute_#{key}"
+      join_customized_attribute(key).where("`#{join_name}`.value = ?", value)
+    }
   end
 
   def create_customized_attributes!
@@ -55,7 +71,7 @@ private
           t.timestamps
         end
 
-        add_index $acts_as_customized_attributes_keys_table_name, :name
+        add_index $acts_as_customized_attributes_keys_table_name, :name, unique: true
 
         create_table $acts_as_customized_attributes_table_name do |t|
           t.belongs_to :resource
@@ -66,6 +82,7 @@ private
 
         add_index $acts_as_customized_attributes_table_name, :data_key_id
         add_index $acts_as_customized_attributes_table_name, :resource_id
+        add_index $acts_as_customized_attributes_table_name, [:data_key_id, :resource_id], unique: true
       end
 
       def down
