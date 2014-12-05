@@ -1,6 +1,13 @@
 module ActsAsCustomizedAttributes::InstanceMethods
   def update_customized_attributes(data)
-    data.each do |key, value|
+    update_customized_attributes_with_args(data: data)
+  end
+
+  UPDATE_CUSTOMIZED_ATTRIBUTES_VALID_ARGS = [:data, :transactioner]
+  def update_customized_attributes_with_args(args)
+    args.each { |key, value| raise "Invalid argument: '#{key}'." unless UPDATE_CUSTOMIZED_ATTRIBUTES_VALID_ARGS.include?(key) }
+
+    args[:data].each do |key, value|
       begin
         key_id = self.class.aaca_key_class.id_for_name(key)
       rescue KeyError
@@ -8,9 +15,21 @@ module ActsAsCustomizedAttributes::InstanceMethods
         key_id = key_model.id
       end
 
-      data = self.class.aaca_data_class.find_or_initialize_by_data_key_id_and_resource_id(key_id, id)
-      data.value = value
-      data.save!
+      data_model = self.data.where(data_key_id: key_id).first
+      if data_model
+        data_model.resource = self # Saves query when validating.
+      else
+        # Set resource in order to skip query when validating.
+        data_model = self.data.new(data_key_id: key_id, resource: self)
+      end
+
+      data_model.value = value
+
+      if args[:transactioner]
+        args[:transactioner].save!(data_model)
+      else
+        data_model.save!
+      end
     end
   end
 
