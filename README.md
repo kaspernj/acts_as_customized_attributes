@@ -33,7 +33,7 @@ class AddCustomizedAttributesForSomeModel < ActiveRecord::Migration
   def up
     SomeModel.create_customized_attributes!
   end
-  
+
   def down
     SomeModel.drop_customized_attributes!
   end
@@ -66,6 +66,15 @@ SomeModel::DataKey.where("name LIKE '%facebook%'")
 
 ```ruby
 SomeModel::Data.where("resource_id > 5")
+```
+
+### Optimize inserts with transactions for inserts / updates.
+```ruby
+ActiveRecordTransactioner.new do |trans|
+  models.each do |model|
+    model.update_customized_attributes_with_args(data: {my_custom_attribute: 5}, transactioner: trans)
+  end
+end
 ```
 
 ## License

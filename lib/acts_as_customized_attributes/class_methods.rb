@@ -2,28 +2,25 @@ module ActsAsCustomizedAttributes::ClassMethods
   def acts_as_customized_attributes(args = {})
     $aaca_class_name_key = "#{name}DataKey"
     $aaca_class_name_data = "#{name}Data"
+    $original_class_name = name
 
     class_data_key = Class.new(ActsAsCustomizedAttributes::DataKey) do
       set_table_name $aaca_class_name_key.tableize
 
       has_many :data, class_name: $aaca_class_name_data, foreign_key: "data_key_id", dependent: :destroy
-
-      after_create :add_to_cache
-      after_update :add_to_cache
-      after_destroy :remove_from_cache
-      before_update :remove_from_cache
     end
 
     class_data = Class.new(ActsAsCustomizedAttributes::Data) do
       set_table_name $aaca_class_name_data.tableize
 
+      belongs_to :resource, class_name: $original_class_name
       belongs_to :data_key, class_name: $aaca_class_name_key
-
-      validates_associated :data_key
     end
 
     Object.const_set($aaca_class_name_key, class_data_key)
     Object.const_set($aaca_class_name_data, class_data)
+
+    class_data.key_class = Object.const_get($aaca_class_name_key)
 
     include ActsAsCustomizedAttributes::InstanceMethods
 

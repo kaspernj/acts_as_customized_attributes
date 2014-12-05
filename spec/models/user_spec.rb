@@ -5,12 +5,13 @@ describe User do
   let!(:order){ create :order, user: user }
 
   before do
+    UserDataKey.update_cache_name_to_id
+
     user.update_customized_attributes(facebook_email: "kaspernj@facebook.com")
+    user.customized_attribute(:facebook_email).should eq "kaspernj@facebook.com"
   end
 
   it "should be possible to set custom data and it shouldn't mix up" do
-    user.update_customized_attributes(facebook_email: "kaspernj@facebook.com")
-
     order.update_customized_attributes(affiliate_data: "test")
     order.customized_attributes[:affiliate_data].should eq "test"
     order.customized_attributes[:facebook_email].should eq nil
@@ -24,17 +25,12 @@ describe User do
   end
 
   it "should help search for attributes" do
-    user.update_customized_attributes(facebook_email: "kaspernj@facebook.com")
-
     users_query = User.where_customized_attribute(:facebook_email, "kaspernj@facebook.com")
     users_query.count.should eq 1
     users_query.first.should eq user
   end
 
   it "should clear cache when key is destroyed" do
-    user.update_customized_attributes(facebook_email: "kaspernj@facebook.com")
-    user.customized_attribute(:facebook_email).should eq "kaspernj@facebook.com"
-
     keys = UserDataKey.where(name: "facebook_email")
     keys.count.should eq 1
     keys.destroy_all
@@ -46,9 +42,6 @@ describe User do
   end
 
   it "should update the cache name" do
-    user.update_customized_attributes(facebook_email: "kaspernj@facebook.com")
-    user.customized_attribute(:facebook_email).should eq "kaspernj@facebook.com"
-
     key = UserDataKey.where(name: "facebook_email").first
     key.name = "facebook_mail"
     key.save!
@@ -61,18 +54,14 @@ describe User do
   end
 
   it "shouldn't allow the same key twice" do
-    user.update_customized_attributes(facebook_email: "kaspernj@facebook.com")
     user.customized_attribute(:facebook_email).should eq "kaspernj@facebook.com"
 
     expect {
       UserDataKey.create!(name: "facebook_email")
-    }.to raise_error(ActiveRecord::RecordNotUnique)
+    }.to raise_error(ActiveRecord::RecordInvalid)
   end
 
   it "shouldn't allow the same data twice" do
-    user.update_customized_attributes(facebook_email: "kaspernj@facebook.com")
-    user.customized_attribute(:facebook_email).should eq "kaspernj@facebook.com"
-
     expect {
       UserData.create!(
         resource_id: user.id,
@@ -80,5 +69,22 @@ describe User do
         value: "test"
       )
     }.to raise_error(ActiveRecord::RecordNotUnique)
+  end
+
+  it "should support transactioner" do
+    require "active-record-transactioner"
+
+    ActiveRecordTransactioner.new do |trans|
+      user.update_customized_attributes_with_args(
+        data: {
+          facebook_email: "test@example.com",
+          some_attribute: "test"
+        },
+        transactioner: trans
+      )
+    end
+
+    user.customized_attribute(:facebook_email).should eq "test@example.com"
+    user.customized_attribute(:some_attribute).should eq "test"
   end
 end
