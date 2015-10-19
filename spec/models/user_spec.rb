@@ -8,33 +8,33 @@ describe User do
     UserDataKey.update_cache_name_to_id
 
     user.update_customized_attributes(facebook_email: "kaspernj@facebook.com")
-    user.customized_attribute(:facebook_email).should eq "kaspernj@facebook.com"
+    expect(user.customized_attribute(:facebook_email)).to eq "kaspernj@facebook.com"
   end
 
   it "should be possible to set custom data and it shouldn't mix up" do
     order.update_customized_attributes(affiliate_data: "test")
-    order.customized_attributes[:affiliate_data].should eq "test"
-    order.customized_attributes[:facebook_email].should eq nil
+    expect(order.customized_attributes[:affiliate_data]).to eq "test"
+    expect(order.customized_attributes[:facebook_email]).to eq nil
   end
 
   it "should autodelete when destroyed" do
     user_id = user.id
     user.destroy
 
-    UserData.joins(:data_key).where(resource_id: user_id, user_data_keys: {name: "facebook_email"}).first.should eq nil
+    expect(UserData.joins(:data_key).where(resource_id: user_id, user_data_keys: {name: "facebook_email"}).first).to eq nil
   end
 
   it "should help search for attributes" do
     users_query = User.where_customized_attribute(:facebook_email, "kaspernj@facebook.com")
-    users_query.count.should eq 1
-    users_query.first.should eq user
+    expect(users_query.count).to eq 1
+    expect(users_query.first).to eq user
   end
 
   it "should clear cache when key is destroyed" do
     keys = UserDataKey.where(name: "facebook_email")
-    keys.count.should eq 1
+    expect(keys.count).to eq 1
     keys.destroy_all
-    keys.count.should eq 0
+    expect(keys.count).to eq 0
 
     expect {
       UserDataKey.id_for_name("facebook_email")
@@ -50,11 +50,11 @@ describe User do
       UserDataKey.id_for_name("facebook_email")
     }.to raise_error(KeyError)
 
-    user.customized_attribute(:facebook_mail).should eq "kaspernj@facebook.com"
+    expect(user.customized_attribute(:facebook_mail)).to eq "kaspernj@facebook.com"
   end
 
   it "shouldn't allow the same key twice" do
-    user.customized_attribute(:facebook_email).should eq "kaspernj@facebook.com"
+    expect(user.customized_attribute(:facebook_email)).to eq "kaspernj@facebook.com"
 
     expect {
       UserDataKey.create!(name: "facebook_email")
@@ -84,7 +84,7 @@ describe User do
       )
     end
 
-    user.customized_attribute(:facebook_email).should eq "test@example.com"
-    user.customized_attribute(:some_attribute).should eq "test"
+    expect(user.customized_attribute(:facebook_email)).to eq "test@example.com"
+    expect(user.customized_attribute(:some_attribute)).to eq "test"
   end
 end

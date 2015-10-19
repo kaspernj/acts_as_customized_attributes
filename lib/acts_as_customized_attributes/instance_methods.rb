@@ -7,7 +7,7 @@ module ActsAsCustomizedAttributes::InstanceMethods
   def update_customized_attributes_with_args(args)
     args.each { |key, value| raise "Invalid argument: '#{key}'." unless UPDATE_CUSTOMIZED_ATTRIBUTES_VALID_ARGS.include?(key) }
 
-    args[:data].each do |key, value|
+    args.fetch(:data).each do |key, value|
       begin
         key_id = self.class.aaca_key_class.id_for_name(key)
       rescue KeyError

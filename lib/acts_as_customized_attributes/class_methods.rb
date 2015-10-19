@@ -4,17 +4,104 @@ module ActsAsCustomizedAttributes::ClassMethods
     $aaca_class_name_data = "#{name}Data"
     $original_class_name = name
 
-    class_data_key = Class.new(ActsAsCustomizedAttributes::DataKey) do
-      set_table_name $aaca_class_name_key.tableize
+    class_data_key = Class.new(ActiveRecord::Base) do
+      if respond_to?(:set_table_name)
+        set_table_name $aaca_class_name_key.tableize
+      else
+        self.table_name = $aaca_class_name_key.tableize
+      end
 
-      has_many :data, class_name: $aaca_class_name_data, foreign_key: "data_key_id", dependent: :destroy
+      after_create :add_to_cache
+      after_update :add_to_cache
+      after_destroy :remove_from_cache
+      before_update :remove_from_cache
+
+      validates_presence_of :name
+      validate :validate_unique_name
+
+      has_many :data, class_name: "#{$aaca_class_name_data}", table_name: "#{$aaca_class_name_data.tableize}", foreign_key: "data_key_id", dependent: :destroy
+
+      def self.id_for_name(name)
+        cache_name_to_id.fetch(name.to_s)
+      end
+
+      def self.name_for_id(id)
+        cache_name_to_id.key(id) or raise KeyError, "No such ID: #{id}"
+      end
+
+      def self.cache_name_to_id
+        update_cache_name_to_id unless @cache_name_to_id
+        return @cache_name_to_id
+      end
+
+      # Initializes / reloads the cache.
+      def self.update_cache_name_to_id
+        @cache_name_to_id = {}
+        find_each do |data_key|
+          @cache_name_to_id[data_key.name] = data_key.id
+        end
+      end
+
+    private
+
+      def add_to_cache
+        self.class.cache_name_to_id[name.to_s] = id
+      end
+
+      def remove_from_cache
+        self.class.cache_name_to_id.delete(name_was)
+      end
+
+      def validate_unique_name
+        begin
+          id_exists = self.class.id_for_name(name)
+
+          if id_exists != id
+            errors.add :name, :taken
+          end
+        rescue KeyError
+          # No problem.
+        end
+      end
     end
 
-    class_data = Class.new(ActsAsCustomizedAttributes::Data) do
-      set_table_name $aaca_class_name_data.tableize
+    class_data = Class.new(ActiveRecord::Base) do
+      if respond_to?(:set_table_name)
+        set_table_name $aaca_class_name_data.tableize
+      else
+        self.table_name = $aaca_class_name_data.tableize
+      end
 
-      belongs_to :resource, class_name: $original_class_name
-      belongs_to :data_key, class_name: $aaca_class_name_key
+      belongs_to :resource, class_name: "#{$original_class_name}"
+      belongs_to :data_key, class_name: "#{$aaca_class_name_key}"
+
+      validate :associated_resource_and_data_key
+
+      def self.key_class=(key_class)
+        @key_class = key_class
+      end
+
+      def self.key_class
+        return @key_class
+      end
+
+    private
+
+      def associated_resource_and_data_key
+        unless data_key_id?
+          return errors.add :data_key_id, "not valid"
+        end
+
+        if !resource_id? || !resource
+          return errors.add :resource_id, "not associated"
+        end
+
+        begin
+          self.class.key_class.name_for_id(data_key_id)
+        rescue KeyError
+          errors.add :data_key_id, "doesn't exist"
+        end
+      end
     end
 
     Object.const_set($aaca_class_name_key, class_data_key)
