@@ -59,13 +59,13 @@ some_model.customized_attributes #=> {:my_custom_attribute => 5}
 #### Query keys.
 
 ```ruby
-SomeModel::DataKey.where("name LIKE '%facebook%'")
+SomeModelDataKey.where("name LIKE '%facebook%'")
 ```
 
 ### Query data
 
 ```ruby
-SomeModel::Data.where("resource_id > 5")
+SomeModelData.where("resource_id > 5")
 ```
 
 ### Optimize inserts with transactions for inserts / updates.
