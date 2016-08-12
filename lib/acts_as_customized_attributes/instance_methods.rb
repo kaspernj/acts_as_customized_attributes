@@ -1,11 +1,12 @@
+# frozen_string_literal: true
 module ActsAsCustomizedAttributes::InstanceMethods
   def update_customized_attributes(data)
     update_customized_attributes_with_args(data: data)
   end
 
-  UPDATE_CUSTOMIZED_ATTRIBUTES_VALID_ARGS = [:data, :transactioner]
+  UPDATE_CUSTOMIZED_ATTRIBUTES_VALID_ARGS = [:data, :transactioner].freeze
   def update_customized_attributes_with_args(args)
-    args.each { |key, value| raise "Invalid argument: '#{key}'." unless UPDATE_CUSTOMIZED_ATTRIBUTES_VALID_ARGS.include?(key) }
+    args.each { |key, _value| raise "Invalid argument: '#{key}'." unless UPDATE_CUSTOMIZED_ATTRIBUTES_VALID_ARGS.include?(key) }
 
     args.fetch(:data).each do |key, value|
       begin
@@ -15,12 +16,12 @@ module ActsAsCustomizedAttributes::InstanceMethods
         key_id = key_model.id
       end
 
-      data_model = self.data.where(data_key_id: key_id).first
+      data_model = data.where(data_key_id: key_id).first
       if data_model
         data_model.resource = self # Saves query when validating.
       else
         # Set resource in order to skip query when validating.
-        data_model = self.data.new(data_key_id: key_id, resource: self)
+        data_model = data.new(data_key_id: key_id, resource: self)
       end
 
       data_model.value = value
@@ -45,6 +46,6 @@ module ActsAsCustomizedAttributes::InstanceMethods
       hash[key_name.to_sym] = data_i.value
     end
 
-    return hash
+    hash
   end
 end

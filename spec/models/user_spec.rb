@@ -1,8 +1,9 @@
+# frozen_string_literal: true
 require "spec_helper"
 
 describe User do
-  let!(:user){ create :user }
-  let!(:order){ create :order, user: user }
+  let!(:user) { create :user }
+  let!(:order) { create :order, user: user }
 
   before do
     UserDataKey.update_cache_name_to_id
@@ -36,9 +37,9 @@ describe User do
     keys.destroy_all
     expect(keys.count).to eq 0
 
-    expect {
+    expect do
       UserDataKey.id_for_name("facebook_email")
-    }.to raise_error(KeyError)
+    end.to raise_error(KeyError)
   end
 
   it "should update the cache name" do
@@ -46,9 +47,9 @@ describe User do
     key.name = "facebook_mail"
     key.save!
 
-    expect {
+    expect do
       UserDataKey.id_for_name("facebook_email")
-    }.to raise_error(KeyError)
+    end.to raise_error(KeyError)
 
     expect(user.customized_attribute(:facebook_mail)).to eq "kaspernj@facebook.com"
   end
@@ -56,19 +57,19 @@ describe User do
   it "shouldn't allow the same key twice" do
     expect(user.customized_attribute(:facebook_email)).to eq "kaspernj@facebook.com"
 
-    expect {
+    expect do
       UserDataKey.create!(name: "facebook_email")
-    }.to raise_error(ActiveRecord::RecordInvalid)
+    end.to raise_error(ActiveRecord::RecordInvalid)
   end
 
   it "shouldn't allow the same data twice" do
-    expect {
+    expect do
       UserData.create!(
         resource_id: user.id,
         data_key_id: UserDataKey.id_for_name("facebook_email"),
         value: "test"
       )
-    }.to raise_error(ActiveRecord::RecordNotUnique)
+    end.to raise_error(ActiveRecord::RecordNotUnique)
   end
 
   it "should support transactioner" do

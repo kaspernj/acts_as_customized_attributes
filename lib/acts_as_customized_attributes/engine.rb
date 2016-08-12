@@ -1,4 +1,6 @@
+# frozen_string_literal: true
 module ActsAsCustomizedAttributes
-  class Engine < Rails::Engine
-  end
+end
+
+class ActsAsCustomizedAttributes::Engine < Rails::Engine
 end
