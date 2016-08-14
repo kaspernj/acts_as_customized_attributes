@@ -1,16 +1,17 @@
+# frozen_string_literal: true
 require "codeclimate-test-reporter"
 CodeClimate::TestReporter.start
 
-ENV["RAILS_ENV"] ||= 'test'
-require 'dummy/config/environment'
-require 'rspec/rails'
-require 'factory_girl_rails'
-require 'forgery'
-require 'sqlite3'
+ENV["RAILS_ENV"] ||= "test"
+require "dummy/config/environment"
+require "rspec/rails"
+require "factory_girl_rails"
+require "forgery"
+require "sqlite3"
 
 # Requires supporting ruby files with custom matchers and macros, etc,
 # in spec/support/ and its subdirectories.
-Dir[Rails.root.join("spec/support/**/*.rb")].each {|f| require f}
+Dir[Rails.root.join("spec/support/**/*.rb")].each { |f| require f }
 
 RSpec.configure do |config|
   # ## Mock Framework

@@ -1,6 +1,3 @@
 test:
-  adapter: mysql2
-  encoding: utf8
-  database: acts_as_customized_attributes
-  pool: 5
-  username: shippa
+  adapter: sqlite3
+  database: db/test.sqlite3
