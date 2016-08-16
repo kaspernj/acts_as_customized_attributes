@@ -35,8 +35,11 @@ module ActsAsCustomizedAttributes::InstanceMethods
   end
 
   def customized_attribute(name)
-    key_id = self.class.aaca_key_class.id_for_name(name)
-    self.class.aaca_data_class.where(data_key_id: key_id).first.try(:value)
+    self.class.aaca_data_class
+      .joins(:data_key)
+      .where(self.class.aaca_key_class.table_name => {name: name}, resource: self)
+      .first
+      .try(:value)
   end
 
   def customized_attributes
