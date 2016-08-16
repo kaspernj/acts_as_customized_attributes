@@ -160,7 +160,8 @@ private
           t.timestamps
         end
 
-        add_foreign_key $acts_as_customized_attributes_table_name, $table_name, column: "data_key_id", on_delete: :cascade
+        add_foreign_key $acts_as_customized_attributes_table_name, $acts_as_customized_attributes_keys_table_name, column: "data_key_id", on_delete: :cascade
+        add_foreign_key $acts_as_customized_attributes_table_name, $table_name, column: "resource_id", on_delete: :cascade
         add_index $acts_as_customized_attributes_table_name, [:data_key_id, :resource_id], unique: true
       end
 
