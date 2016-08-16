@@ -56,6 +56,10 @@ some_model.customized_attributes #=> {:my_custom_attribute => 5}
 
 ### Queries
 
+```ruby
+model.customized_attribute("name_of_key") #=> "some_value"
+```
+
 #### Query keys.
 
 ```ruby
