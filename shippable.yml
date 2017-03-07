@@ -5,11 +5,9 @@ rvm:
   - 1.9.3-p547
 before_script:
   - cp spec/dummy/config/database.shippable.yml spec/dummy/config/database.yml
-  - mysql -e 'DROP DATABASE IF EXISTS acts_as_customized_attributes;'
-  - mysql -e 'CREATE DATABASE acts_as_customized_attributes;'
-  - cd spec/dummy && RAILS_ENV=test bundle exec rake db:migrate && cd ../..
+  - bundle exec rake db:schema:load RAILS_ENV=test
 script:
-  - CODECLIMATE_REPO_TOKEN=2c574a5d4b24ed64083e173286a48fc3073e8b779ab2b7c744450b915fd64603 bundle exec rspec
+  - bundle exec rspec CODECLIMATE_REPO_TOKEN=2c574a5d4b24ed64083e173286a48fc3073e8b779ab2b7c744450b915fd64603
   - bundle exec rake best_practice_project:run
 notifications:
    email: false
