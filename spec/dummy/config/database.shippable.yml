@@ -1,4 +1,4 @@
 test:
   adapter: postgresql
-  database: build
-  username: build
+  database: aaca_test
+  username: postgres
