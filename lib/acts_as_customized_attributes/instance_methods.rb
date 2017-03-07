@@ -43,12 +43,12 @@ module ActsAsCustomizedAttributes::InstanceMethods
   end
 
   def customized_attributes
-    hash = {}
+    attributes_hash = {}
     data.each do |data_i|
       key_name = self.class.aaca_key_class.name_for_id(data_i.data_key_id)
-      hash[key_name.to_sym] = data_i.value
+      attributes_hash[key_name.to_sym] = data_i.value
     end
 
-    hash
+    attributes_hash
   end
 end

@@ -31,15 +31,20 @@ module ActsAsCustomizedAttributes::ClassMethods
       end
 
       def self.cache_name_to_id
+        reset_cache_name_to_id if Rails.env.test? # Always reset when testing to avoid caching problems
         update_cache_name_to_id unless @cache_name_to_id
-        @cache_name_to_id
+        @_cache_name_to_id
+      end
+
+      def self.reset_cache_name_to_id
+        @_cache_name_to_id = nil
       end
 
       # Initializes / reloads the cache.
       def self.update_cache_name_to_id
-        @cache_name_to_id = {}
+        @_cache_name_to_id = {}
         find_each do |data_key|
-          @cache_name_to_id[data_key.name] = data_key.id
+          @_cache_name_to_id[data_key.name] = data_key.id
         end
       end
 
