@@ -7,9 +7,9 @@ module ActsAsCustomizedAttributes::ClassMethods
 
     class_data_key = Class.new(ActiveRecord::Base) do
       if respond_to?(:set_table_name)
-        set_table_name $aaca_class_name_key.tableize
+        set_table_name $aaca_class_name_key.tableize.tr("/", "_")
       else
-        self.table_name = $aaca_class_name_key.tableize
+        self.table_name = $aaca_class_name_key.tableize.tr("/", "_")
       end
 
       after_create :add_to_cache
@@ -64,9 +64,9 @@ module ActsAsCustomizedAttributes::ClassMethods
 
     class_data = Class.new(ActiveRecord::Base) do
       if respond_to?(:set_table_name)
-        set_table_name $aaca_class_name_data.tableize
+        set_table_name $aaca_class_name_data.tableize.tr("/", "_")
       else
-        self.table_name = $aaca_class_name_data.tableize
+        self.table_name = $aaca_class_name_data.tableize.tr("/", "_")
       end
 
       belongs_to :resource, class_name: $original_class_name.to_s
@@ -99,10 +99,21 @@ module ActsAsCustomizedAttributes::ClassMethods
       end
     end
 
-    Object.const_set($aaca_class_name_key, class_data_key)
-    Object.const_set($aaca_class_name_data, class_data)
+    # Set the constants
+    constant_to_set_on = Object
+    constant_name_parts = $aaca_class_name_key.split("::")
+    constant_name_parts.each_with_index do |constant_name_part, index|
+      next if index >= (constant_name_parts.length - 1)
+      constant_to_set_on = constant_to_set_on.const_get(constant_name_part)
+    end
+
+    data_constant_name = $aaca_class_name_data.split("::").last
+
+    constant_to_set_on.const_set(constant_name_parts.last, class_data_key)
+    constant_to_set_on.const_set(data_constant_name, class_data)
 
     class_data.key_class = Object.const_get($aaca_class_name_key)
+    # End of setting constants
 
     include ActsAsCustomizedAttributes::InstanceMethods
 
@@ -111,12 +122,12 @@ module ActsAsCustomizedAttributes::ClassMethods
     scope :join_customized_attribute, lambda { |key|
       key_id = aaca_key_class.id_for_name(key)
       join_name = "customized_attribute_#{key}"
-      joins("LEFT JOIN `#{aaca_data_class.table_name}` AS `#{join_name}` ON resource_id = `#{table_name}`.`id` AND `#{join_name}`.`data_key_id` = '#{key_id}'")
+      joins("LEFT JOIN #{aaca_data_class.table_name} AS #{join_name} ON resource_id = #{table_name}.id AND #{join_name}.data_key_id = '#{key_id}'")
     }
 
     scope :where_customized_attribute, lambda { |key, value|
       join_name = "customized_attribute_#{key}"
-      join_customized_attribute(key).where("`#{join_name}`.value = ?", value)
+      join_customized_attribute(key).where("#{join_name}.value = ?", value)
     }
   end
 
@@ -139,8 +150,8 @@ module ActsAsCustomizedAttributes::ClassMethods
 private
 
   def migration_class
-    $acts_as_customized_attributes_keys_table_name = "#{name.downcase}_data_keys"
-    $acts_as_customized_attributes_table_name = "#{name.downcase}_data"
+    $acts_as_customized_attributes_keys_table_name = "#{name.tableize.singularize.tr("/", "_")}_data_keys"
+    $acts_as_customized_attributes_table_name = "#{name.tableize.singularize.tr("/", "_")}_data"
     $table_name = table_name
 
     Class.new(ActiveRecord::Migration) do
