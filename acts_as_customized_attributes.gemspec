@@ -18,13 +18,4 @@ Gem::Specification.new do |s|
   s.test_files = Dir["spec/**/*"]
 
   s.add_dependency "rails", ">= 4"
-
-  s.add_development_dependency "rspec-rails", "3.3.3"
-  s.add_development_dependency "factory_girl_rails", "4.5.0"
-  s.add_development_dependency "forgery", "0.6.0"
-  s.add_development_dependency "codeclimate-test-reporter", "0.4.8"
-  s.add_development_dependency "pg", "0.18.4"
-  s.add_development_dependency "active-record-transactioner"
-  s.add_development_dependency "best_practice_project", "0.0.10"
-  s.add_development_dependency "rubocop", "0.42.0"
 end
