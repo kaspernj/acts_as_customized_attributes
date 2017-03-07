@@ -1,6 +1,4 @@
 test:
-  adapter: mysql2
-  encoding: utf8
+  adapter: postgresql
   database: build
-  pool: 5
   username: build
